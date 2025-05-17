@@ -1,5 +1,5 @@
 from fastapi import FastAPI 
-from core.config import settings
+from store.core.config import settings
 
 class App(FastAPI):
     def __init__(self, *args, **kwargs) -> None:
