@@ -19,17 +19,33 @@ dependencies = [
 ]
 
 [tool.pytest.ini_options]
+# Modo do asyncio
 asyncio_mode = "auto"
+# Define explicitamente o escopo de loop para fixtures assíncronas
+asyncio_default_fixture_loop_scope = "function"
+# Opções adicionais para melhor saída
 addopts = [
-  "--strict-config",
-  "--strict-markers",
-  "--ignore=docs_src",
+    "--strict-config",
+    "--strict-markers",
+    "-v",
+    "--tb=short",
+    "--ignore=docs_src",
 ]
+# Filtra avisos
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+    "ignore::pydantic.warnings.PydanticDeprecatedSince20",
+]
+# Outras configurações
 xfail_strict = true
 junit_family = "xunit2"
 
 [tool.poetry]
 package-mode = false
+
+[tool.poetry.group.dev.dependencies]
+httpx = "^0.28.1"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

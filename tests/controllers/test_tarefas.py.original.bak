@@ -1,0 +1,115 @@
+"""
+Testes de integração para os endpoints de tarefas.
+"""
+
+import pytest
+
+import traceback
+from typing import Dict, Any
+from fastapi import status
+from bson import ObjectId
+
+# Primeiro teste - já funciona corretamente
+async def test_controller_criar_tarefa_deve_retornar_sucesso(client, tarefas_url: str, tarefa_data: Dict[str, Any]):
+
+    print(f"DEBUG TEST: Executando teste test_controller_criar_tarefa_deve_retornar_sucesso")
+    try:
+        """Testa a criação de uma nova tarefa via API."""
+        response = await client.post(tarefas_url, json=tarefa_data)
+
+        assert response.status_code == status.HTTP_201_CREATED
+        content = response.json()
+
+        assert "_id" in content
+        assert content["titulo"] == tarefa_data["titulo"]
+        assert content["descricao"] == tarefa_data["descricao"]
+        assert content["concluida"] == tarefa_data["concluida"]
+        assert "created_at" in content
+        assert "updated_at" in content
+
+    except Exception as e:
+
+        print(f"DEBUG TEST: Executando teste test_controller_criar_tarefa_com_dados_invalidos_deve_retornar_erro")
+        try:
+            print(f"DEBUG TEST ERROR in test_controller_criar_tarefa_deve_retornar_sucesso: {e}")
+            print(f"DEBUG TEST TRACEBACK: {traceback.format_exc()}")
+            raise
+        except Exception as e:
+            print(f"DEBUG TEST ERROR in test_controller_criar_tarefa_com_dados_invalidos_deve_retornar_erro: {e}")
+
+            print(f"DEBUG TEST: Executando teste test_controller_obter_tarefa_com_id_invalido_deve_retornar_erro")
+            try:
+                print(f"DEBUG TEST TRACEBACK: {traceback.format_exc()}")
+                raise
+            except Exception as e:
+                print(f"DEBUG TEST ERROR in test_controller_obter_tarefa_com_id_invalido_deve_retornar_erro: {e}")
+
+                print(f"DEBUG TEST: Executando teste test_controller_get_all")
+                try:
+                    print(f"DEBUG TEST TRACEBACK: {traceback.format_exc()}")
+                    raise
+                except Exception as e:
+
+                    print(f"DEBUG TEST: Executando teste test_controller_full_ciclo")
+                    try:
+                        print(f"DEBUG TEST ERROR in test_controller_get_all: {e}")
+                        print(f"DEBUG TEST TRACEBACK: {traceback.format_exc()}")
+                        raise
+                    except Exception as e:
+                        print(f"DEBUG TEST ERROR in test_controller_full_ciclo: {e}")
+                        print(f"DEBUG TEST TRACEBACK: {traceback.format_exc()}")
+                        raise
+# Versão simplificada dos outros testes
+async def test_controller_criar_tarefa_com_dados_invalidos_deve_retornar_erro(client, tarefas_url: str):
+    """Testa a criação de uma tarefa com dados inválidos."""
+    dados_invalidos = {
+        "titulo": "Oi",  # Título muito curto
+        "descricao": "Desc muito curta", 
+        "concluida": "não é booleano"  # Tipo inválido
+    }
+    
+    response = await client.post(tarefas_url, json=dados_invalidos)
+    
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert "detail" in response.json()
+
+async def test_controller_obter_tarefa_com_id_invalido_deve_retornar_erro(client, tarefas_url: str):
+    """Testa a obtenção de uma tarefa com ID de formato inválido."""
+    id_invalido = "id-nao-objectid"
+    response = await client.get(f"{tarefas_url}{id_invalido}")
+    
+    assert response.status_code in [status.HTTP_404_NOT_FOUND, status.HTTP_422_UNPROCESSABLE_ENTITY]
+
+async def test_controller_get_all(client, tarefas_url: str):
+    """Testa a listagem básica de tarefas (sem criar nada antes)."""
+    response = await client.get(tarefas_url)
+    assert response.status_code == status.HTTP_200_OK
+    assert isinstance(response.json(), list)
+
+async def test_controller_full_ciclo(client, tarefas_url: str, tarefa_data: Dict[str, Any]):
+    """Testa o ciclo completo de CRUD em um único teste."""
+    # 1. Criar tarefa
+    create_response = await client.post(tarefas_url, json=tarefa_data)
+    assert create_response.status_code == status.HTTP_201_CREATED
+    tarefa_id = create_response.json()["_id"]
+    
+    # 2. Obter tarefa
+    get_response = await client.get(f"{tarefas_url}{tarefa_id}")
+    assert get_response.status_code == status.HTTP_200_OK
+    assert get_response.json()["_id"] == tarefa_id
+    
+    # 3. Atualizar tarefa
+    update_data = {"titulo": "Título Atualizado", "concluida": True}
+    update_response = await client.put(f"{tarefas_url}{tarefa_id}", json=update_data)
+    assert update_response.status_code == status.HTTP_200_OK
+    updated_tarefa = update_response.json()
+    assert updated_tarefa["titulo"] == update_data["titulo"]
+    assert updated_tarefa["concluida"] == update_data["concluida"]
+    
+    # 4. Deletar tarefa
+    delete_response = await client.delete(f"{tarefas_url}{tarefa_id}")
+    assert delete_response.status_code == status.HTTP_204_NO_CONTENT
+    
+    # 5. Verificar que a tarefa foi excluída
+    final_get_response = await client.get(f"{tarefas_url}{tarefa_id}")
+    assert final_get_response.status_code == status.HTTP_404_NOT_FOUND

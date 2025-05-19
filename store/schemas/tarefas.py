@@ -3,28 +3,18 @@ from pydantic import BaseModel, Field
 from store.schemas.base import BaseSchemaMixin, OutSchema
 
 class TarefaBase(BaseSchemaMixin):
-    """
-    Esquema base para uma Tarefa.
-    Contém os campos comuns que uma tarefa terá.
-    """
+    
     titulo: str = Field(..., min_length=3, max_length=50, description="Título da tarefa")
     descricao: str = Field(..., min_length=5, max_length=255, description="Descrição detalhada da tarefa")
     concluida: bool = Field(False, description="Indica se a tarefa foi concluída")
 
 class TarefaIn(TarefaBase):
-    """
-    Esquema para dados de entrada ao criar uma nova Tarefa.
-    Herda os campos de TarefaBase.
-    O ID é gerado automaticamente pelo banco de dados, então não é incluído aqui.
-    """
-    pass # Não há campos adicionais em relação a TarefaBase para a criação
+
+    pass
 
 class TarefaOut(TarefaBase, OutSchema):
-    """
-    Esquema para dados de saída ao retornar uma Tarefa da API.
-    Inclui todos os campos de TarefaBase e os campos de OutSchema (id, created_at, updated_at).
-    """
-    pass # Os campos já estão definidos nas classes base
+
+    pass 
 
 class TarefaUpdate(BaseSchemaMixin):
     """
