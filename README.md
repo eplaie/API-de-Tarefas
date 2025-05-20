@@ -60,21 +60,13 @@ API desenvolvida para gerenciar tarefas, permitindo operações de criação, le
 1.  **Clonar o Repositório (se aplicável):**
     Se você estiver obtendo o código de um repositório Git:
     ```bash
-    git clone <url-do-seu-repositorio-git>
-    cd nome-do-repositorio-clonado
+    git clone <https://github.com/eplaie/API-de-Tarefas.git>
+    cd API-de-Tarefas
     ```
 
 2.  **Configurar o Arquivo `.env`:**
     Este projeto utiliza um arquivo `.env` para gerenciar variáveis de ambiente, como a string de conexão do banco de dados.
-    * Crie um arquivo chamado `.env` na raiz do projeto.
-    * Adicione o seguinte conteúdo ao arquivo, ajustando se necessário:
 
-    ```env
-    DATABASE_URL='mongodb://localhost:27017/store?uuidRepresentation=standard'
-    PROJECT_NAME='API de Tarefas (Desenvolvimento)'
-    ROOT_PATH='/'
-    # Adicione outras variáveis de ambiente que sua aplicação possa precisar
-    ```
     * **Nota:** A `DATABASE_URL` acima assume que o MongoDB estará rodando localmente (via Docker) na porta padrão `27017` e usará um banco de dados chamado `store`.
 
 ## Instalação das Dependências
@@ -139,8 +131,6 @@ Essas interfaces permitem visualizar todos os endpoints, seus parâmetros, corpo
 Além de usar o Swagger UI, você pode testar os endpoints da API usando ferramentas de cliente HTTP como:
 
 * [Postman](https://www.postman.com/)
-* [Insomnia](https://insomnia.rest/)
-* `curl` (linha de comando)
 
 **Endpoints Principais:**
 
@@ -269,3 +259,5 @@ Os testes automatizados visam cobrir os seguintes cenários:
         * Tentativa de deleção de tarefa com ID inexistente (espera status 404).
 
 ## Diagramas
+
+Diagrmas disponibilizados no arquivo DIAGRAMS.md

@@ -1,8 +1,3 @@
-"""
-Módulo de Use Cases para Tarefas
-Versão ultra simplificada para testes.
-"""
-
 from datetime import datetime
 from typing import List, Dict, Any
 from bson import ObjectId
